@@ -7,6 +7,7 @@ import com.creditcard.Creditcard.repository.UserRepo;
 import com.creditcard.Creditcard.service.BillGenerationService;
 import com.creditcard.Creditcard.service.UserService;
 import com.creditcard.Creditcard.shared.customer.UserDto;
+import com.creditcard.Creditcard.ui.model.response.user.CreditCardResponseModel;
 import com.creditcard.Creditcard.ui.model.response.user.Messages;
 import com.creditcard.Creditcard.ui.model.response.user.UserResponseModel;
 import io.swagger.annotations.ApiImplicitParam;
@@ -61,6 +62,20 @@ public class AdminController {
         BillGenerationEntity billGeneration=billGenerationService.generateBill(user,amount,email);
         return billGeneration;
 
+    }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @Secured("ROLE_ADMIN")
+    @PostMapping(path = "/user/limitIncrease/{email}/{hike}")
+    public CreditCardResponseModel limitIncrease(@PathVariable(value = "email") String email, @PathVariable(value = "hike") Long hike){
+        UserEntity user=userRepo.findByEmail(email);
+        if (user==null){
+            throw new ClientSideException(Messages.USER_DOES_NOT_EXIST);
+        }
+        return billGenerationService.increaseLimit(user,hike,email);
     }
 
 }

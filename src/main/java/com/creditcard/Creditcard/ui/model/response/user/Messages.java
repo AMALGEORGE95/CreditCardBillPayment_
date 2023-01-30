@@ -5,7 +5,7 @@ package com.creditcard.Creditcard.ui.model.response.user;
  */
 public enum Messages {
 
-    TRANSACTION_SUCCESSFUL("Transaction Successful."),
+    NOT_ELGIBLE("Account not elgible for a hike"),
     RECORD_ALREADY_EXISTS("Verified account already exists for this email, please use a different email."),
     NO_RECORD_FOUND("Account with provided id not found"),
     NO_BILLS_FOUND("No pending Bills"),
