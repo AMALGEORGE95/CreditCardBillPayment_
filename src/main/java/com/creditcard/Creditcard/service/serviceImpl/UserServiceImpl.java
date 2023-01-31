@@ -50,38 +50,45 @@ public class UserServiceImpl implements UserService {
     PaymentRepo paymentRepo;
     @Autowired
     EmailService emailService;
+    @Autowired
+    AddressRepository addressRepository;
 
     public UserResponseModel createUser(UserDto user) throws ClientSideException {
-        for (int i = 0; i < user.getAddress().size(); i++) {
-            AddressDto addressdto = user.getAddress().get(i);
-            addressdto.setUserDetails(user);
-            user.getAddress().set(i, addressdto);
-        }
-        AccountDto accountDto=user.getAccountDetails();
-        accountDto.setUserDetails(user);
-        user.setAccountDetails(user.getAccountDetails());
+        UserEntity alreadyExsistingUser = userRepo.findByEmail(user.getEmail());
+        if (alreadyExsistingUser != null) {
+            throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS);
+        } else {
+            for (int i = 0; i < user.getAddress().size(); i++) {
+                AddressDto addressdto = user.getAddress().get(i);
+                addressdto.setUserDetails(user);
+                user.getAddress().set(i, addressdto);
+            }
+            AccountDto accountDto = user.getAccountDetails();
+            accountDto.setUserDetails(user);
+            user.setAccountDetails(user.getAccountDetails());
 
-        CreditCardDto creditCardDto=user.getCreditCardDetails();
-        creditCardDto.setUserDetails(user);
-        user.setCreditCardDetails(user.getCreditCardDetails());
-        UserEntity user1 = new ModelMapper().map(user, UserEntity.class);
-        user1.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user1.setUserId(utils.generateUserId(30));
-        RoleEntity roleEntity = roleRepository.findByName("ROLE_USER");
-        Collection<RoleEntity> arrayList = new ArrayList<>();
-        arrayList.add(roleEntity);
-        user1.setRoles(arrayList);
+            CreditCardDto creditCardDto = user.getCreditCardDetails();
+            creditCardDto.setUserDetails(user);
+            user.setCreditCardDetails(user.getCreditCardDetails());
+            UserEntity user1 = new ModelMapper().map(user, UserEntity.class);
+            user1.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user1.setUserId(utils.generateUserId(30));
+            RoleEntity roleEntity = roleRepository.findByName("ROLE_USER");
+            Collection<RoleEntity> arrayList = new ArrayList<>();
+            arrayList.add(roleEntity);
+            user1.setRoles(arrayList);
 
 //        String token = utils.generateEmailVerificationToken(user1.getUserId());
 //        user1.setEmailVerificationToken(token);
-        //customer1.setPassword(bCryptPasswordEncoder.encode(customer1.getPassword()));
-        userRepo.save(user1);
-        UserResponseModel responseModel= new UserResponseModel();
-        responseModel.setFirstName(user1.getFirstName());
-        responseModel.setLastName(user1.getLastName());
-        responseModel.setEmail(user1.getEmail());
-        responseModel.setPhoneNumber(user1.getPhoneNumber());
-        return responseModel;
+            //customer1.setPassword(bCryptPasswordEncoder.encode(customer1.getPassword()));
+            userRepo.save(user1);
+            UserResponseModel responseModel = new UserResponseModel();
+            responseModel.setFirstName(user1.getFirstName());
+            responseModel.setLastName(user1.getLastName());
+            responseModel.setEmail(user1.getEmail());
+            responseModel.setPhoneNumber(user1.getPhoneNumber());
+            return responseModel;
+        }
     }
     @Override
     public UserDto getUser(String email) throws ClientSideException{
@@ -215,6 +222,63 @@ public class UserServiceImpl implements UserService {
         else
             return billsToPay;
     }
+
+    @Override
+    public UserDto updateUser(String userId, UserDto user) {
+        UserEntity userEntity = userRepo.findByUserId(userId);
+        if (user.getFirstName() != null){
+            userEntity.setFirstName(user.getFirstName());
+        }
+        if (user.getLastName() != null){
+            userEntity.setLastName(user.getLastName());
+        }
+        if (user.getPhoneNumber() != null){
+            userEntity.setPhoneNumber(user.getPhoneNumber());
+        }
+        if (user.getEmail() != null){
+            userEntity.setEmail(user.getEmail());
+        }
+        UserEntity updatedUserDetails;
+        try{
+            updatedUserDetails = userRepo.save(userEntity);
+        }
+        catch (Exception e){
+            throw new ClientSideException(Messages.FAILED_DB_SAVE.getMessage());
+        }
+        return new ModelMapper().map(updatedUserDetails,UserDto.class);
+    }
+
+    @Override
+    public AddressDto updateAddress(String userId, AddressDto addressDto, Long addressId) {
+        Long id = userRepo.findIdByUserId(userId);
+        AddressEntity address = addressRepository.findByIdAndUserId(addressId,id);
+        if (addressDto.getCity()!=null){
+            address.setCity(addressDto.getCity());
+        }
+        if (addressDto.getType()!=null){
+            address.setType(addressDto.getType());
+        }
+        if (addressDto.getCountry()!=null){
+            address.setCountry(addressDto.getCountry());
+        }
+        if (addressDto.getStreetName()!=null){
+            address.setStreetName(addressDto.getStreetName());
+        }
+        if (addressDto.getPostalCode()!=null){
+            address.setPostalCode(addressDto.getPostalCode());
+        }
+        AddressEntity updatedAddressDetails;
+        try {
+            {
+                updatedAddressDetails=addressRepository.save(address);
+            }
+        }
+        catch (Exception e){
+            throw new ClientSideException(Messages.FAILED_DB_SAVE.getMessage());
+        }
+        return new ModelMapper().map(updatedAddressDetails, AddressDto.class);
+    }
+
 
 }
 

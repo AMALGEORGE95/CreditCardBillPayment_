@@ -3,6 +3,7 @@ package com.creditcard.Creditcard.service;
 import com.creditcard.Creditcard.entity.BillGenerationEntity;
 import com.creditcard.Creditcard.entity.PaymentEntity__;
 import com.creditcard.Creditcard.exception.ClientSideException;
+import com.creditcard.Creditcard.shared.customer.AddressDto;
 import com.creditcard.Creditcard.shared.customer.UserDto;
 import com.creditcard.Creditcard.ui.model.response.user.UserResponseModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,4 +23,9 @@ public interface UserService  extends UserDetailsService {
     List<PaymentEntity__> fetchPaymentRecords(String userId);
 
     List<BillGenerationEntity> fetchBillsToPay(String userId);
+
+
+    UserDto updateUser(String userId, UserDto user);
+
+    AddressDto updateAddress(String userId, AddressDto addressDto, Long addressId);
 }

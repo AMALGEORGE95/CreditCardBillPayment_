@@ -3,9 +3,14 @@ import com.creditcard.Creditcard.entity.BillGenerationEntity;
 import com.creditcard.Creditcard.entity.PaymentEntity__;
 import com.creditcard.Creditcard.exception.ClientSideException;
 import com.creditcard.Creditcard.service.UserService;
+import com.creditcard.Creditcard.shared.customer.AddressDto;
 import com.creditcard.Creditcard.shared.customer.UserDto;
+import com.creditcard.Creditcard.ui.model.request.user.AddressRequestModel;
+import com.creditcard.Creditcard.ui.model.request.user.UserBasicDetailsRequestModel;
 import com.creditcard.Creditcard.ui.model.request.user.UserRequestModel;
+import com.creditcard.Creditcard.ui.model.response.user.AddressResponseModel;
 import com.creditcard.Creditcard.ui.model.response.user.Messages;
+import com.creditcard.Creditcard.ui.model.response.user.UserBasicDetailsResponseModel;
 import com.creditcard.Creditcard.ui.model.response.user.UserResponseModel;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -72,5 +77,32 @@ public class UserController {
             throw new ClientSideException(Messages.NO_BILLS_FOUND);
         }
         return billsToPay;
+    }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @Secured("ROLE_USER")
+    @PutMapping(path="/user/updateBasicDetails")
+    public UserBasicDetailsResponseModel updateUser(@RequestBody UserBasicDetailsRequestModel userDetails) throws ClientSideException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+        UserDto updatedUser = userService.updateUser(user.getUserId(),new ModelMapper().map(userDetails,UserDto.class));
+        return new ModelMapper().map(updatedUser,UserBasicDetailsResponseModel.class);
+    }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @Secured("ROLE_USER")
+    @PutMapping(path="/user/address/update/{addressId}")
+    public AddressResponseModel updateAddress(@PathVariable(value = "addressId") Long addressId,@RequestBody AddressRequestModel addressDetails) throws ClientSideException{
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+        AddressDto addressDto = new ModelMapper().map(addressDetails,AddressDto.class);
+        AddressDto updatedAddress = userService.updateAddress(user.getUserId(),addressDto,addressId);
+        return new ModelMapper().map(updatedAddress,AddressResponseModel.class);
     }
 }
