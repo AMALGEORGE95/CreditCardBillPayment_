@@ -29,12 +29,24 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    //    http://localhost:8080/creditcard/api/reg/customer/create
+    /**
+     * Method to create User with account and credit card details.
+     * @param userDetails
+     * @return userDto
+     * @throws ClientSideException
+     */
     @PostMapping(path="/user/create")
     public UserResponseModel createUser(@RequestBody UserRequestModel userDetails) throws ClientSideException {
         UserDto userDto = new ModelMapper().map(userDetails,UserDto.class);
         return userService.createUser(userDto);
     }
+
+    /**
+     * Method for the user to pay the bill which is pending
+     * @param billId
+     * @return PaymentEntity
+     * @throws ClientSideException
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -49,6 +61,12 @@ public class UserController {
         return payment;
 
     }
+
+    /**
+     * method for the user to fetch all the payment records.
+     * @return List<PaymentEntity>
+     * @throws ClientSideException
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -62,6 +80,12 @@ public class UserController {
         List<PaymentEntity__> records = userService.fetchPaymentRecords(user.getUserId());
         return records;
     }
+
+    /**
+     * Method for the user to fetch the payment records which is pending
+     * @return List<BillGenerationEntity>
+     * @throws ClientSideException
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -78,6 +102,13 @@ public class UserController {
         }
         return billsToPay;
     }
+
+    /**
+     * Method for the user to update the basic details.
+     * @param userDetails
+     * @return UserBasicDetailsResponseModel
+     * @throws ClientSideException
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -91,6 +122,14 @@ public class UserController {
         UserDto updatedUser = userService.updateUser(user.getUserId(),new ModelMapper().map(userDetails,UserDto.class));
         return new ModelMapper().map(updatedUser,UserBasicDetailsResponseModel.class);
     }
+
+    /**
+     * Method for the user to update the address
+     * @param addressId
+     * @param addressDetails
+     * @return AddressResponseModel
+     * @throws ClientSideException
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
