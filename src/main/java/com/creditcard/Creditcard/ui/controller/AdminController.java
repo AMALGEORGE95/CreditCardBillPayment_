@@ -29,6 +29,13 @@ public class AdminController {
     UserRepo userRepo;
     @Autowired
     BillGenerationService billGenerationService;
+
+    /**
+     * Method for the admin to view all the users.
+     * @param page
+     * @param limit
+     * @return List<UserResponseModel>
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -47,6 +54,13 @@ public class AdminController {
         }
         return returnValue;
     }
+
+    /**
+     * Method for the admin to generate bill for each user.
+     * @param email
+     * @param amount
+     * @return BillGenerationEntity
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -63,6 +77,13 @@ public class AdminController {
         return billGeneration;
 
     }
+
+    /**
+     * Method for the admin to give hike in the credit card limit if the user is eligible(done more than 10 payments)
+     * @param email
+     * @param hike
+     * @return CreditCardResponseModel
+     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",

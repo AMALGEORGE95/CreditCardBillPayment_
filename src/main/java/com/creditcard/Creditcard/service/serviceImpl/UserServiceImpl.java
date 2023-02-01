@@ -77,10 +77,7 @@ public class UserServiceImpl implements UserService {
             Collection<RoleEntity> arrayList = new ArrayList<>();
             arrayList.add(roleEntity);
             user1.setRoles(arrayList);
-
-//        String token = utils.generateEmailVerificationToken(user1.getUserId());
-//        user1.setEmailVerificationToken(token);
-            //customer1.setPassword(bCryptPasswordEncoder.encode(customer1.getPassword()));
+            user1.setEmailVerificationStatus(true);
             userRepo.save(user1);
             UserResponseModel responseModel = new UserResponseModel();
             responseModel.setFirstName(user1.getFirstName());
