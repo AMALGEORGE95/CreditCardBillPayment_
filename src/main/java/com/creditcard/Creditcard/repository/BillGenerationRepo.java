@@ -24,6 +24,6 @@ public interface BillGenerationRepo extends CrudRepository<BillGenerationEntity,
     @Query(value = "UPDATE bill_generation set status=?2 WHERE user_id = ?1",nativeQuery = true)
     void updateById(Long id, String success);
 
-    @Query(value ="SELECT * FROM bill_generation b WHERE b.user_id=?1 and b.status=?2 order by bill_id desc limit 1",nativeQuery = true)
+    @Query(value ="SELECT * FROM bill_generation b WHERE b.user_id=?1 and b.status=?2",nativeQuery = true)
     List<BillGenerationEntity> findListByUserId(Long id, String pending);
 }
